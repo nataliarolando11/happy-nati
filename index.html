@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Watchlist">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Mi Watchlist</title>
+<style>
+:root{--bg:#0b0d12;--card:#141821;--muted:#9ca3af;--text:#f5f7fb;--accent:#d6b36a;--border:rgba(255,255,255,.09)}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 15% 0%,rgba(214,179,106,.13),transparent 32%),radial-gradient(circle at 90% 20%,rgba(80,110,180,.12),transparent 30%),var(--bg)}
+.wrap{max-width:1200px;margin:auto;padding:42px 22px 60px}header{margin-bottom:30px}.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.18em;font-size:.72rem;font-weight:700}h1{font-family:Georgia,serif;font-size:clamp(2.3rem,6vw,4.7rem);line-height:.95;margin:10px 0}.intro{color:var(--muted);line-height:1.6}.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0 30px}input[type=search]{flex:1;min-width:220px;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:#10131a;color:var(--text);outline:none}.count{padding:13px 16px;border:1px solid var(--border);border-radius:12px;color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px}.card{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.22);transition:.2s}.card:hover{transform:translateY(-4px)}.poster{aspect-ratio:2/3;background:#20242d;position:relative;overflow:hidden}.poster img{width:100%;height:100%;object-fit:cover;display:block}.fallback{display:none;position:absolute;inset:0;padding:20px;align-items:flex-end;background:linear-gradient(145deg,#252a35,#11131a);font-family:Georgia,serif;font-size:1.6rem}.info{padding:17px}.title{font-family:Georgia,serif;font-size:1.25rem;margin:0 0 7px}.meta{font-size:.82rem;color:var(--muted);margin-bottom:13px}.check{display:flex;align-items:center;gap:9px;color:#d5d8df;font-size:.9rem;cursor:pointer}.check input{width:18px;height:18px;accent-color:var(--accent)}.watched{opacity:.55}.watched .title{text-decoration:line-through}.empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:50px 10px}@media(max-width:560px){.wrap{padding:30px 15px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.info{padding:12px}.title{font-size:1rem}.meta{font-size:.72rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="eyebrow">Mi watchlist</div><h1>Películas que quiero ver</h1><p class="intro">Tu colección personal. Marcá las que ya viste y buscá entre ellas.</p></header>
+<div class="toolbar"><input id="search" type="search" placeholder="Buscar una película…"><div class="count" id="count"></div></div>
+<main class="grid" id="grid"></main>
+</div>
+<script>
+const movies=[
+{id:"interstellar",title:"Interestelar",original:"Interstellar",year:"2014",poster:"https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"},
+{id:"no-other-choice",title:"La única opción",original:"No Other Choice",year:"2025",poster:"https://m.media-amazon.com/images/M/MV5BMjg3NzY0N2ItZGFlMy00NzAzLTk2NjItMDk2YTU3ZWU0MDA1XkEyXkFqcGc%40._V1_QL75_UY281_CR4%2C0%2C190%2C281_.jpg"},
+{id:"sacred-deer",title:"El sacrificio de un ciervo sagrado",original:"The Killing of a Sacred Deer",year:"2017",poster:"https://image.tmdb.org/t/p/w500/e4DGlsc9g0h5AyoyvvAuIRnofN7.jpg"},
+{id:"a-separation",title:"A Separation",original:"Nader and Simin, a Separation",year:"2011",poster:"https://image.tmdb.org/t/p/w500/hMQXRvVmlo52rSZjehkBU42ljue.jpg"},
+{id:"wandering-saint",title:"Chronicles of a Wandering Saint",original:"Crónicas de una Santa Errante",year:"2023",poster:"https://cdn.posteritati.com/posters/000/000/072/832/chronicles-of-a-wandering-saint-md-web.jpg"}];
+const key="peliculas-watchlist-v2",state=JSON.parse(localStorage.getItem(key)||"{}"),grid=document.getElementById("grid"),search=document.getElementById("search"),count=document.getElementById("count");
+function render(){let q=search.value.trim().toLowerCase(),visible=movies.filter(m=>(m.title+" "+m.original+" "+m.year).toLowerCase().includes(q));grid.innerHTML=visible.length?visible.map(m=>{let w=!!state[m.id];return `<article class="card ${w?"watched":""}"><div class="poster"><img src="${m.poster}" alt="Póster de ${m.title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="fallback">${m.title}</div></div><div class="info"><h2 class="title">${m.title}</h2><div class="meta">${m.year} · ${m.original}</div><label class="check"><input type="checkbox" ${w?"checked":""} onchange="toggle('${m.id}',this.checked)">Ya la vi</label></div></article>`}).join(""):`<div class="empty">No encontramos esa película.</div>`;count.textContent=`${movies.filter(m=>state[m.id]).length}/${movies.length} vistas`}
+function toggle(id,v){state[id]=v;localStorage.setItem(key,JSON.stringify(state));render()}search.addEventListener("input",render);render();
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+</script>
+</body>
+</html>
