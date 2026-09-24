@@ -1,0 +1,12 @@
+{
+  "name": "Mi Watchlist",
+  "short_name": "Watchlist",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
+  "description": "Mi lista personal de películas para ver.",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
